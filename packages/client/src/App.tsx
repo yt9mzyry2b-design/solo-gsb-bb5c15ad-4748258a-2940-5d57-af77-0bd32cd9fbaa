@@ -15,6 +15,7 @@ import GridEditor from './GridEditor.js';
 import CommandEditor from './CommandEditor.js';
 import RepeatPanel from './RepeatPanel.js';
 import DiffPanel from './DiffPanel.js';
+import YarnPanel from './YarnPanel.js';
 
 const SYMBOLS = ['A', 'B', 'C'];
 const DEFAULT_WIDTH = 12;
@@ -486,6 +487,7 @@ export default function App() {
               offset={repeatOffset}
               onOffsetChange={setRepeatOffset}
             />
+            <YarnPanel grid={grid} symbols={SYMBOLS} />
             <div className="action-bar">
               <button
                 type="button"

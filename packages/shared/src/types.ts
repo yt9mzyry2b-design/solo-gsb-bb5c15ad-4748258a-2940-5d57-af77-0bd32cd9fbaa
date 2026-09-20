@@ -249,3 +249,70 @@ export interface RepeatResult {
   /** 压缩比 = totalCells / unitArea（≥ 1） */
   ratio: number;
 }
+
+/* ====================================================================== */
+/* 备纱配筒                                                               */
+/* ====================================================================== */
+
+/** 一种符号（颜色）的用纱参数 */
+export interface YarnParams {
+  /** 单耗：克 / 1000 针（非负，允许小数） */
+  gramsPerK: number;
+  /** 损耗率：0 ～ 0.30（即 0% ～ 30%） */
+  lossRate: number;
+}
+
+/** 一个纱筒：同一符号内编号唯一，可用克重以 0.1 克为粒度 */
+export interface YarnCone {
+  /** 纱筒编号（同一符号内唯一、非空） */
+  id: string;
+  /** 可用克重（非负，内部规整到 0.1 克） */
+  weight: number;
+}
+
+/** 备纱配筒请求：当前网格 + 各符号的单耗/损耗率/纱筒库存 */
+export interface YarnPlanRequest {
+  grid: string[][];
+  /** 参与配筒的符号集合（如 ['A','B','C']），结果按此顺序返回 */
+  symbols: string[];
+  /** 各符号单耗与损耗率（键为大写符号） */
+  params: Record<string, YarnParams>;
+  /** 各符号的纱筒库存（键为大写符号，每符号最多 20 个） */
+  cones: Record<string, YarnCone[]>;
+}
+
+/** 单个符号的配筒结果（全部克重均为 0.1 克的整数倍） */
+export interface YarnSymbolPlan {
+  symbol: string;
+  /** 该符号在当前网格中的针数（视觉坐标计数，与奇偶行无关） */
+  stitches: number;
+  /** 实际参与计算的单耗（克/1000 针，非规整 < 0 按 0） */
+  gramsPerK: number;
+  /** 实际参与计算的损耗率（裁剪到 0～0.30） */
+  lossRate: number;
+  /** 毛需求克重 = 针数 × 单耗 ÷ 1000 × (1 + 损耗率)，向上取到 0.1 克 */
+  demand: number;
+  /** 库存是否足以覆盖需求（需求为 0 时恒为 true） */
+  feasible: boolean;
+  /** 选中的纱筒（按编号自然序排列）；不足或零需求时为空数组 */
+  selected: YarnCone[];
+  /** 选中纱筒的克重合计 */
+  selectedWeight: number;
+  /** 余量 = 选中合计 − 需求（可行时 ≥ 0） */
+  surplus: number;
+  /** 全部有效纱筒（编号去重、克重规整后）的可用量合计 */
+  available: number;
+  /** 缺口 = 需求 − 全部可用量（仅库存不足时 > 0，此时不生成任何组合） */
+  shortage: number;
+  /** 参与配筒的有效纱筒数（空编号/重复编号已剔除） */
+  coneCount: number;
+  /** 最优方案的启用筒数；零需求或库存不足时为 null */
+  minCones: number | null;
+  /** 精确枚举过的等量筒数组合数 C(n, k)；零需求或库存不足时为 null */
+  evaluated: number | null;
+}
+
+export interface YarnPlanResult {
+  /** 按请求 symbols 顺序排列的各符号配筒结果 */
+  rows: YarnSymbolPlan[];
+}
