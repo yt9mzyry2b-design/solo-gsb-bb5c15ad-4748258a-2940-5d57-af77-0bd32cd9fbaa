@@ -8,6 +8,7 @@ import {
   checkFloats,
   compareCandidate,
   findMinRepeatUnit,
+  planYarn,
   searchBestAlignment,
 } from '@jacquard/shared';
 import { api } from './api.js';
@@ -15,6 +16,8 @@ import GridEditor from './GridEditor.js';
 import CommandEditor from './CommandEditor.js';
 import RepeatPanel from './RepeatPanel.js';
 import DiffPanel from './DiffPanel.js';
+import YarnPanel from './YarnPanel.js';
+import type { YarnConfig } from './YarnPanel.js';
 
 const SYMBOLS = ['A', 'B', 'C'];
 const DEFAULT_WIDTH = 12;
@@ -35,6 +38,76 @@ function noopPaint() {}
 /** 偏移量带符号显示：+2 / 0 / -1 */
 function formatOffset(n: number): string {
   return n > 0 ? `+${n}` : String(n);
+}
+
+/** 备纱配筒配置的 localStorage 键 */
+const YARN_STORAGE_KEY = 'jacquard.yarnConfig.v1';
+
+/** 默认备纱配置：A/B/C 用纱参数 + 少量示例纱筒 */
+function defaultYarnConfig(): YarnConfig {
+  return {
+    specs: SYMBOLS.map((symbol) => ({
+      symbol,
+      gramsPer1000: 2,
+      lossRate: 0.1,
+    })),
+    cones: [
+      { id: 'A1', symbol: 'A', grams: 5 },
+      { id: 'A2', symbol: 'A', grams: 3 },
+      { id: 'B1', symbol: 'B', grams: 2 },
+      { id: 'B2', symbol: 'B', grams: 1.5 },
+      { id: 'B3', symbol: 'B', grams: 1 },
+      { id: 'C1', symbol: 'C', grams: 1 },
+    ],
+  };
+}
+
+/** 从 localStorage 读取备纱配置；结构非法时回退默认配置 */
+function loadYarnConfig(): YarnConfig {
+  try {
+    const raw = localStorage.getItem(YARN_STORAGE_KEY);
+    if (!raw) return defaultYarnConfig();
+    const data = JSON.parse(raw) as YarnConfig;
+    if (!Array.isArray(data.specs) || !Array.isArray(data.cones)) {
+      return defaultYarnConfig();
+    }
+    const specs = SYMBOLS.map((symbol) => {
+      const s = data.specs.find((x) => x && x.symbol === symbol);
+      const gramsPer1000 = Number(s?.gramsPer1000);
+      const lossRate = Number(s?.lossRate);
+      return {
+        symbol,
+        gramsPer1000:
+          Number.isFinite(gramsPer1000) && gramsPer1000 >= 0
+            ? Math.min(999.9, gramsPer1000)
+            : 0,
+        lossRate:
+          Number.isFinite(lossRate) && lossRate >= 0
+            ? Math.min(0.3, lossRate)
+            : 0,
+      };
+    });
+    const cones = data.cones
+      .filter(
+        (c) =>
+          c &&
+          typeof c.id === 'string' &&
+          c.id !== '' &&
+          SYMBOLS.includes(c.symbol) &&
+          Number.isFinite(Number(c.grams)) &&
+          Number(c.grams) > 0,
+      )
+      .slice(0, 20)
+      .map((c) => ({ id: c.id, symbol: c.symbol, grams: Number(c.grams) }));
+    // 编号唯一性：重复编号只保留第一个
+    const seen = new Set<string>();
+    return {
+      specs,
+      cones: cones.filter((c) => !seen.has(c.id) && (seen.add(c.id), true)),
+    };
+  } catch {
+    return defaultYarnConfig();
+  }
 }
 
 /** 示例提花图案：交错菱形 */
@@ -172,6 +245,25 @@ export default function App() {
   useEffect(() => {
     setRepeatOffset({ r: 0, c: 0 });
   }, [repeatResult.unitRows, repeatResult.unitCols]);
+
+  /**
+   * 备纱配筒：配置（克/1000针、损耗率、纱筒清单）保存在 localStorage；
+   * 方案为纯函数实时重算——绘制、改尺寸、口令回写都会更新 grid，
+   * 配置编辑更新 yarnConfig，二者任一变化即重新计算需求与选筒。
+   */
+  const [yarnConfig, setYarnConfig] = useState<YarnConfig>(loadYarnConfig);
+  useEffect(() => {
+    try {
+      localStorage.setItem(YARN_STORAGE_KEY, JSON.stringify(yarnConfig));
+    } catch {
+      // 本地存储不可用时仅放弃持久化，不影响实时计算
+    }
+  }, [yarnConfig]);
+
+  const yarnPlan = useMemo(
+    () => planYarn(grid, yarnConfig.specs, yarnConfig.cones),
+    [grid, yarnConfig],
+  );
 
   /** 口令文本是否与当前网格一致（未手工修改） */
   const syncedText = useRef<string | null>(null);
@@ -485,6 +577,12 @@ export default function App() {
               repeat={repeatResult}
               offset={repeatOffset}
               onOffsetChange={setRepeatOffset}
+            />
+            <YarnPanel
+              symbols={SYMBOLS}
+              config={yarnConfig}
+              plan={yarnPlan}
+              onConfigChange={setYarnConfig}
             />
             <div className="action-bar">
               <button

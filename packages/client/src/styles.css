@@ -1142,6 +1142,245 @@ button.diff-item:hover {
   font-weight: 600;
 }
 
+/* ---------- 备纱配筒 ---------- */
+:root {
+  --yarn: #0f766e;
+  --yarn-bg: #f2faf8;
+  --yarn-border: #9fd9d0;
+  --yarn-danger: #b91c1c;
+}
+
+.yarn-panel {
+  margin-top: 14px;
+  border: 1px solid var(--yarn-border);
+  border-radius: 8px;
+  background: var(--yarn-bg);
+}
+
+.yarn-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: baseline;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--yarn-border);
+}
+
+.yarn-title {
+  font-weight: 700;
+  color: var(--yarn);
+}
+
+.yarn-meta {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.yarn-meta strong {
+  color: var(--yarn);
+}
+
+.yarn-meta .yarn-short {
+  color: var(--yarn-danger);
+}
+
+.yarn-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.yarn-symbol {
+  border: 1px solid var(--yarn-border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yarn-symbol-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  align-items: center;
+}
+
+.yarn-symbol-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--yarn);
+}
+
+.yarn-symbol-head label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.yarn-symbol-head input[type='number'] {
+  width: 72px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  background: #fff;
+}
+
+.yarn-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.yarn-stats strong {
+  color: var(--yarn);
+}
+
+.yarn-stats.infeasible strong,
+.yarn-stats .yarn-gap {
+  color: var(--yarn-danger);
+  font-weight: 700;
+}
+
+.yarn-surplus {
+  color: var(--yarn);
+  font-weight: 600;
+}
+
+.yarn-pick {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--yarn-bg);
+  border: 1px solid var(--yarn-border);
+  color: var(--yarn);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.yarn-cone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.yarn-cone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fafbfc;
+  font-size: 12.5px;
+}
+
+.yarn-cone.selected {
+  border-color: var(--yarn);
+  background: var(--yarn-bg);
+  box-shadow: inset 0 0 0 1px var(--yarn);
+}
+
+.yarn-cone-id {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.yarn-cone-grams {
+  color: var(--muted);
+}
+
+.yarn-badge {
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--yarn);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.yarn-remove {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
+.yarn-remove:hover {
+  color: var(--danger);
+}
+
+.yarn-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.yarn-add input[type='text'] {
+  width: 110px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.yarn-add input[type='number'] {
+  width: 96px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.yarn-add button {
+  padding: 5px 12px;
+  border: 1px solid var(--yarn);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--yarn);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.yarn-add button:hover {
+  background: var(--yarn);
+  color: #fff;
+}
+
+.yarn-add button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.yarn-error {
+  color: var(--yarn-danger);
+  font-size: 12.5px;
+}
+
 .app-footer {
   margin-top: 18px;
   text-align: center;

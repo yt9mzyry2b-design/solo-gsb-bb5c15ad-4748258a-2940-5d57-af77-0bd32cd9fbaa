@@ -249,3 +249,49 @@ export interface RepeatResult {
   /** 压缩比 = totalCells / unitArea（≥ 1） */
   ratio: number;
 }
+
+/* ---------- 备纱配筒 ---------- */
+
+/** 一个纱筒：唯一编号 + 所属符号 + 可用克重 */
+export interface YarnCone {
+  /** 唯一编号（同一配置内不可重复） */
+  id: string;
+  /** 所属符号（如 'A'）：只有同符号的筒才参与该符号的配筒 */
+  symbol: string;
+  /** 可用克重（克） */
+  grams: number;
+}
+
+/** 某符号的用纱参数 */
+export interface YarnSymbolSpec {
+  symbol: string;
+  /** 克/1000针 */
+  gramsPer1000: number;
+  /** 损耗率（0～0.30） */
+  lossRate: number;
+}
+
+/**
+ * 一种符号的配筒结果。
+ * 需求 = 针数 × 克/1000针 ÷ 1000 × (1 + 损耗率)，向上取到 0.1 克。
+ * 库存不足时不生成伪可行组合：selected 为 null，给出缺口与全部可用量。
+ */
+export interface YarnSymbolPlan {
+  symbol: string;
+  /** 当前网格中该符号的针数 */
+  stitches: number;
+  gramsPer1000: number;
+  lossRate: number;
+  /** 需求克重（已向上取到 0.1 克） */
+  demand: number;
+  /** 该符号全部纱筒的可用量合计（克） */
+  totalAvailable: number;
+  /** 库存是否足以覆盖需求 */
+  feasible: boolean;
+  /** 选中的筒（按编号升序）；库存不足时为 null */
+  selected: YarnCone[] | null;
+  /** 余量 = 选中筒合计 − 需求（可行时 ≥ 0） */
+  surplus: number | null;
+  /** 缺口 = 需求 − 全部可用量（不可行时 > 0） */
+  shortfall: number | null;
+}

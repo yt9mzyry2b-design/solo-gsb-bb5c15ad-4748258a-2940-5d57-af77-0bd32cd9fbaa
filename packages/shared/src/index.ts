@@ -4,3 +4,4 @@ export * from './float.js';
 export * from './repeat.js';
 export * from './diff.js';
 export * from './align.js';
+export * from './yarn.js';
