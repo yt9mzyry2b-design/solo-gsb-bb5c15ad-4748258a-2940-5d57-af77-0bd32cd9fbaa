@@ -1,0 +1,20 @@
+{
+  "name": "jacquard-rle-checker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "提花编织口令校验：定宽符号网格与逐行游程口令双向转换",
+  "workspaces": [
+    "packages/shared",
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/shared && npm run build -w packages/server && npm run build -w packages/client",
+    "dev": "concurrently -n shared,server,client -c blue,green,magenta \"npm run dev -w packages/shared\" \"npm run dev -w packages/server\" \"npm run dev -w packages/client\"",
+    "start": "npm run start -w packages/server",
+    "test": "node --test packages/shared/test/"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
